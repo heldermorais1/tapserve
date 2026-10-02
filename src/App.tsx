@@ -626,7 +626,10 @@ function LoginPage({ onLogin, onBack }: { onLogin: (role: AppRole) => void; onBa
 
       onLogin(role);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Não foi possível entrar.";
+      const fetchFailed = err instanceof Error && (err.name === "AuthRetryableFetchError" || /failed to fetch/i.test(err.message));
+      const message = fetchFailed
+        ? "Não foi possível conectar ao Supabase. Confira VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY nas Environment Variables da Vercel e faça um novo deploy."
+        : err instanceof Error ? err.message : "Não foi possível entrar.";
       setError(message);
       console.error("Supabase login failed:", err);
     } finally {
