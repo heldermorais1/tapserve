@@ -1129,6 +1129,34 @@ function resolveRouteFromPath(): AppRoute {
   return "landing";
 }
 
+const pageMetadata: Record<AppRoute, { title: string; description: string; robots: string }> = {
+  landing: {
+    title: "TapServe | Atendimento inteligente para restaurantes",
+    description: "Organize chamados, pedidos, conta e avaliações com QR Code e NFC. A TapServe conecta clientes e equipe em uma plataforma de atendimento para restaurantes.",
+    robots: "index, follow",
+  },
+  contact: {
+    title: "Contato | TapServe",
+    description: "Fale com a equipe TapServe por email ou WhatsApp e descubra como simplificar o atendimento do seu restaurante.",
+    robots: "index, follow",
+  },
+  login: {
+    title: "Entrar | TapServe",
+    description: "Acesse a plataforma TapServe para gerenciar o atendimento do seu restaurante.",
+    robots: "noindex, nofollow",
+  },
+  admin: {
+    title: "Administração | TapServe",
+    description: "Painel administrativo da plataforma TapServe.",
+    robots: "noindex, nofollow",
+  },
+  user: {
+    title: "Painel do restaurante | TapServe",
+    description: "Gerencie chamados, mesas, cardápio e avaliações do seu restaurante com TapServe.",
+    robots: "noindex, nofollow",
+  },
+};
+
 export default function App() {
   const [route, setRoute] = useState<AppRoute>(() => resolveRouteFromPath());
   const [adminSection, setAdminSection] = useState<AdminSection>("overview");
@@ -1146,6 +1174,42 @@ export default function App() {
     const target = nextRoute === "landing" ? "/" : nextRoute === "login" ? "/login" : nextRoute === "contact" ? "/contato" : nextRoute === "admin" ? "/app/admin" : "/app/user";
     window.history.pushState({}, "", target);
   };
+
+  useEffect(() => {
+    const metadata = pageMetadata[route];
+    document.title = metadata.title;
+
+    const setMeta = (attribute: "name" | "property", key: string, content: string) => {
+      let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${key}"]`);
+      if (!element) {
+        element = document.createElement("meta");
+        element.setAttribute(attribute, key);
+        document.head.append(element);
+      }
+      element.content = content;
+    };
+
+    setMeta("name", "description", metadata.description);
+    setMeta("name", "robots", metadata.robots);
+    setMeta("property", "og:title", metadata.title);
+    setMeta("property", "og:description", metadata.description);
+    setMeta("name", "twitter:title", metadata.title);
+    setMeta("name", "twitter:description", metadata.description);
+
+    const publicPath = route === "landing" ? "/" : route === "contact" ? "/contato" : null;
+    const canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    const ogUrl = document.head.querySelector<HTMLMetaElement>('meta[property="og:url"]');
+    if (publicPath) {
+      const url = new URL(publicPath, window.location.origin).href;
+      const canonicalLink = canonical ?? document.head.appendChild(document.createElement("link"));
+      canonicalLink.rel = "canonical";
+      canonicalLink.href = url;
+      setMeta("property", "og:url", url);
+    } else {
+      canonical?.remove();
+      ogUrl?.remove();
+    }
+  }, [route]);
 
   useEffect(() => {
     const handlePopState = () => setRoute(resolveRouteFromPath());

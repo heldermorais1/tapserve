@@ -20,7 +20,10 @@ logs/
 /.plugins/
 /.opencode-skills/
 /.figaro/
-/.figma/
+/.figma/*
+!/.figma/make/
+/.figma/make/*
+!/.figma/make/site.json
 /tmp/
 /src/imports/pasted_text/
 /supabase/.temp/

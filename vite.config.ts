@@ -139,15 +139,21 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
           tags.push({ tag: 'link', attrs: { rel: 'icon', href: favicon }, injectTo: 'head' })
         }
         if (title) {
-          tags.push({ tag: 'meta', attrs: { property: 'og:title', content: title }, injectTo: 'head' })
+          tags.push(
+            { tag: 'meta', attrs: { property: 'og:title', content: title }, injectTo: 'head' },
+            { tag: 'meta', attrs: { name: 'twitter:title', content: title }, injectTo: 'head' },
+          )
         }
         if (description) {
-          tags.push({ tag: 'meta', attrs: { property: 'og:description', content: description }, injectTo: 'head' })
+          tags.push(
+            { tag: 'meta', attrs: { property: 'og:description', content: description }, injectTo: 'head' },
+            { tag: 'meta', attrs: { name: 'twitter:description', content: description }, injectTo: 'head' },
+          )
         }
+        tags.push({ tag: 'meta', attrs: { name: 'twitter:card', content: socialImage ? 'summary_large_image' : 'summary' }, injectTo: 'head' })
         if (socialImage) {
           tags.push(
             { tag: 'meta', attrs: { property: 'og:image', content: socialImage }, injectTo: 'head' },
-            { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' }, injectTo: 'head' },
             { tag: 'meta', attrs: { name: 'twitter:image', content: socialImage }, injectTo: 'head' },
           )
         }

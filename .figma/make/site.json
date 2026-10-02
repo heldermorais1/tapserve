@@ -1,0 +1,15 @@
+{
+  "title": "TapServe | Atendimento inteligente para restaurantes",
+  "description": "Organize chamados, pedidos, conta e avaliações com QR Code e NFC. A TapServe conecta clientes e equipe em uma plataforma de atendimento para restaurantes.",
+  "language": "pt-AO",
+  "robots": {
+    "index": true
+  },
+  "icons": {
+    "icon": "/favicon.svg"
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
