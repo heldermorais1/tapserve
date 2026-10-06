@@ -83,6 +83,11 @@ function Logo({ compact = false, dark = false }: { compact?: boolean; dark?: boo
 }
 
 const pdfViewerUrl = (url: string) => `${url}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`;
+const getPublicSiteBaseUrl = () => {
+  const configured = (import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin).trim();
+  return configured.replace(/\/+$/, "");
+};
+const tableUrl = (table: number) => `${getPublicSiteBaseUrl()}/?mesa=${table}`;
 const CONTACT_EMAIL = "suportetapserver@gmail.com";
 const CONTACT_WHATSAPP_NUMBER = "244946970233";
 const CONTACT_WHATSAPP_LINK = `https://wa.me/${CONTACT_WHATSAPP_NUMBER}?text=${encodeURIComponent("Olá, gostaria de saber mais sobre o TapServe.")}`;
@@ -464,7 +469,7 @@ function TableAccess({ tableCount, restaurantName }: { tableCount: number; resta
   const [qrCodes, setQrCodes] = useState<Record<number, string>>({});
   const [message, setMessage] = useState("");
   const effectiveTableCount = Math.min(200, Math.max(1, Math.floor(tableCount) || 12));
-  const tableUrl = (table: number) => `${window.location.origin}${window.location.pathname}?mesa=${table}`;
+  const tableUrl = (table: number) => `${getPublicSiteBaseUrl()}/?mesa=${table}`;
 
   useEffect(() => {
     let active = true;
