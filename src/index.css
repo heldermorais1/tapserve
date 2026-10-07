@@ -1453,11 +1453,53 @@ main { padding: 28px 34px 40px; max-width: 1440px; margin: auto; }
   }
 
   .nav-login {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .landing-brand .logo {
+    width: 108px;
+    height: 32px;
+  }
+
+  .nav-cta {
+    height: 36px;
+    padding: 0 11px;
+    font-size: 10px;
+    white-space: nowrap;
   }
 
   .hero-copy h1 {
     font-size: clamp(54px, 16vw, 82px);
+  }
+
+  @media (max-width: 420px) {
+    .landing-nav {
+      width: calc(100% - 20px);
+      padding: 10px 11px;
+    }
+
+    .landing-brand .logo {
+      width: 92px;
+    }
+
+    .landing-nav > div {
+      gap: 2px;
+    }
+
+    .landing-nav .nav-cta {
+      display: none;
+    }
+
+    .landing-nav .nav-login {
+      min-width: 58px;
+      color: var(--ink);
+      font-weight: 800;
+    }
   }
 
   .hero-lead {
