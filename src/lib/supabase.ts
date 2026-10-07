@@ -42,12 +42,104 @@ export async function getRestaurantSettings(restaurantId: string | null) {
 
 export async function listRestaurantCalls(restaurantId: string | null) {
   if (!restaurantId) return { data: [], error: null };
-  return supabase.from("calls").select("*").eq("restaurant_id", restaurantId).order("created_at", { ascending: false });
+  return supabase.from("calls").select("*").eq("restaurant_id", restaurantId).eq("status", "pending").order("created_at", { ascending: false });
+}
+
+export async function resolveRestaurantCall(callId: string) {
+  return supabase
+    .from("calls")
+    .update({ status: "resolved", resolved_at: new Date().toISOString() })
+    .eq("id", callId)
+    .eq("status", "pending")
+    .select("id")
+    .single();
 }
 
 export async function listRestaurantRatings(restaurantId: string | null) {
   if (!restaurantId) return { data: [], error: null };
   return supabase.from("ratings").select("*").eq("restaurant_id", restaurantId).order("created_at", { ascending: false });
+}
+
+export type MenuMediaItem = {
+  type: "image" | "video";
+  url: string;
+};
+
+export type RestaurantMenuItem = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  promotional_price: number | null;
+  currency: string;
+  status: "active" | "paused";
+  image_url: string | null;
+  reel_url: string | null;
+  video_url: string | null;
+  media_items: MenuMediaItem[];
+  category: string;
+  category_id: string | null;
+  tags: string[];
+  is_featured: boolean;
+  position: number;
+};
+
+export async function listRestaurantMenuItems(restaurantId: string) {
+  return supabase
+    .from("menu_items")
+    .select("id,name,description,price,promotional_price,currency,status,image_url,reel_url,video_url,media_items,category,category_id,tags,is_featured,position")
+    .eq("restaurant_id", restaurantId)
+    .order("position", { ascending: true })
+    .order("created_at", { ascending: true });
+}
+
+export type RestaurantMenuCategory = { id: string; name: string; description: string | null; position: number };
+
+export async function listRestaurantMenuCategories(restaurantId: string) {
+  return supabase
+    .from("menu_categories")
+    .select("id,name,description,position")
+    .eq("restaurant_id", restaurantId)
+    .order("position", { ascending: true })
+    .order("name", { ascending: true });
+}
+
+export async function saveRestaurantMenuCategory(restaurantId: string, name: string, description: string) {
+  return supabase
+    .from("menu_categories")
+    .insert({ restaurant_id: restaurantId, name: name.trim(), description: description.trim() || null })
+    .select("id,name,description,position")
+    .single();
+}
+
+export async function deleteRestaurantMenuCategory(restaurantId: string, categoryId: string) {
+  return supabase
+    .from("menu_categories")
+    .delete()
+    .eq("restaurant_id", restaurantId)
+    .eq("id", categoryId);
+}
+
+export async function saveRestaurantMenuItem(
+  restaurantId: string,
+  item: Omit<RestaurantMenuItem, "id">,
+  itemId: string | null
+) {
+  const values = { restaurant_id: restaurantId, ...item };
+  const query = itemId
+    ? supabase.from("menu_items").update(values).eq("restaurant_id", restaurantId).eq("id", itemId)
+    : supabase.from("menu_items").insert(values);
+  return query.select("id").single();
+}
+
+export async function deleteRestaurantMenuItem(restaurantId: string, itemId: string) {
+  return supabase.from("menu_items").delete().eq("restaurant_id", restaurantId).eq("id", itemId);
+}
+
+export type CustomerMenuItem = Pick<RestaurantMenuItem, "id" | "name" | "description" | "price" | "promotional_price" | "currency" | "image_url" | "reel_url" | "video_url" | "category" | "tags" | "is_featured" | "media_items">;
+
+export async function getCustomerMenu(restaurantSlug: string) {
+  return supabase.rpc("get_customer_menu", { p_restaurant_slug: restaurantSlug });
 }
 
 export async function insertCall({
